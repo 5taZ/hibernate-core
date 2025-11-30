@@ -4,9 +4,7 @@ import components.TransactionHelper;
 import entity.Client;
 import entity.Order;
 import entity.Profile;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 
 @Service

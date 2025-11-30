@@ -56,4 +56,12 @@ public class Client {
         orders.add(order);
         order.setClient(this);
     }
+
+    public void removeOrder(Order order) {
+        orders.remove(order);
+        order.setClient(null);
+    }
+    public void addCoupon(Coupon coupon) {
+        coupons.add(coupon);
+    }
 }
