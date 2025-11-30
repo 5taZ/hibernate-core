@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,15 +24,15 @@ public class Client {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "registraion_date")
+    @Column(name = "registration_date")
     private LocalDateTime registrationDate;
 
-    @OneToOne(mappedBy = "client",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "client",cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile;
 
-    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "client_coupons",
@@ -39,9 +40,5 @@ public class Client {
             inverseJoinColumns = @JoinColumn(name = "coupon_id")
             )
     @ToString.Exclude
-    private List<Coupon> coupons;
-
-
-
-
+    private List<Coupon> coupons = new ArrayList<>();
 }
