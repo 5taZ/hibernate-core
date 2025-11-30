@@ -1,9 +1,9 @@
-package services;
+package by.staz.services;
 
-import components.TransactionHelper;
-import entity.Client;
-import entity.Order;
-import entity.Profile;
+import by.staz.components.TransactionHelper;
+import by.staz.entity.Client;
+import by.staz.entity.Order;
+import by.staz.entity.Profile;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 

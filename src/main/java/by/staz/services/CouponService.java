@@ -1,7 +1,7 @@
-package services;
+package by.staz.services;
 
-import components.TransactionHelper;
-import entity.Coupon;
+import by.staz.components.TransactionHelper;
+import by.staz.entity.Coupon;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 

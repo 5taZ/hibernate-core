@@ -1,15 +1,16 @@
-package services;
+package by.staz.services;
 
-import entity.Client;
-import entity.Coupon;
-import entity.Order;
-import entity.Profile;
+import by.staz.entity.Client;
+import by.staz.entity.Coupon;
+import by.staz.entity.Order;
+import by.staz.entity.Profile;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
 
-@Service
+@Configuration
 public class HibernateConfiguration {
+
     @Bean
     public SessionFactory sessionFactory() {
         org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();

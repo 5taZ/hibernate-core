@@ -1,4 +1,4 @@
-package components;
+package by.staz.components;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -36,7 +36,7 @@ public class TransactionHelper {
         try(Session session = sessionFactory.openSession()){
             transaction = session.getTransaction();
             transaction.begin();
-            var result = action.apply(session);
+            T result = action.apply(session);
             transaction.commit();
             return result;
         }

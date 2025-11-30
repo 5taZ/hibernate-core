@@ -1,4 +1,4 @@
-package entity;
+package by.staz.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
