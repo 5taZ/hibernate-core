@@ -2,6 +2,8 @@ package services;
 
 import components.TransactionHelper;
 import entity.Client;
+import entity.Order;
+import entity.Profile;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -20,6 +22,39 @@ public class ClientService {
         return transactionHelper.executeInTransaction(session -> {
             session.persist(client);
             return client;
+        });
+    }
+    public void deleteClient(Long id){
+        transactionHelper.executeInTransaction(session -> {
+            Client removableClient = session.get(Client.class,id);
+            if (removableClient != null)
+                session.remove(removableClient);
+        });
+    }
+    public void updateClientProfile(Long clientId, String address, String phone){
+        transactionHelper.executeInTransaction(session -> {
+            Client client = session.get(Client.class, clientId);
+            if(client != null){
+                Profile profile = client.getProfile();
+                if(profile == null){
+                    profile = new Profile();
+                    client.setProfile(profile);
+                }
+                profile.setAddress(address);
+                profile.setPhone(phone);
+            }
+        });
+    }
+    public Client findClient(Long id){
+        return transactionHelper.executeInTransaction(session -> {
+            return session.get(Client.class, id);
+        });
+    }
+
+    public void addOrderToClient(Long clientId, Order newOrder){
+        transactionHelper.executeInTransaction(session -> {
+            Client client = session.get(Client.class, clientId);
+            client.addOrder(newOrder);
         });
     }
 }

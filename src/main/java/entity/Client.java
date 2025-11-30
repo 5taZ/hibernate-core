@@ -41,4 +41,19 @@ public class Client {
             )
     @ToString.Exclude
     private List<Coupon> coupons = new ArrayList<>();
+
+    public void setProfile(Profile profile) {
+        if (profile == null) {
+            if (this.profile != null) {
+                this.profile.setClient(null);
+            }
+        } else {
+            profile.setClient(this);
+        }
+        this.profile = profile;
+    }
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setClient(this);
+    }
 }
