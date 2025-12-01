@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "coupons")
 @Getter
@@ -22,4 +25,7 @@ public class Coupon {
 
     @Column(name = "discount")
     private Double discount;
+
+    @ManyToMany(mappedBy = "coupons")
+    private Set<Client> clients = new HashSet<>();
 }

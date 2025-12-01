@@ -43,16 +43,12 @@ public class Client {
     private List<Coupon> coupons = new ArrayList<>();
 
     public void setProfile(Profile profile) {
-        if (profile == null) {
-            if (this.profile != null) {
-                this.profile.setClient(null);
-            }
-        } else {
+        this.profile = profile;
+        if(profile != null){
             profile.setClient(this);
         }
-        this.profile = profile;
     }
-    public void addOrder(Order order) {
+    public void addOrder(Order order){
         orders.add(order);
         order.setClient(this);
     }
@@ -63,5 +59,10 @@ public class Client {
     }
     public void addCoupon(Coupon coupon) {
         coupons.add(coupon);
+        coupon.getClients().add(this);
+    }
+    public void remove(Coupon coupon) {
+        coupons.remove(coupon);
+        coupon.getClients().remove(this);
     }
 }
