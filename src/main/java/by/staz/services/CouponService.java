@@ -7,33 +7,35 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CouponService {
-    private final SessionFactory sessionFactory;
     private final TransactionHelper transactionHelper;
 
     public CouponService(SessionFactory sessionFactory, TransactionHelper transactionHelper) {
-        this.sessionFactory = sessionFactory;
         this.transactionHelper = transactionHelper;
     }
 
-    public Coupon saveCoupon(Coupon coupon){
-        return transactionHelper.executeInTransaction(session -> {
-            session.persist(coupon);
-            return coupon;
-        });
-    }
-
-    public void updateCoupon(Long id, String code, Double discount){
+    public void editCoupon(Long id, String newCode, Double newDiscount) {
         transactionHelper.executeInTransaction(session -> {
             Coupon coupon = session.get(Coupon.class, id);
-            if (coupon != null){
-                coupon.setCode(code);
-                coupon.setDiscount(discount);
+
+            if (coupon != null) {
+                coupon.setCode(newCode);
+                coupon.setDiscount(newDiscount);
+
+                System.out.println("Купон с ID " + id + " успешно обновлен.");
+            } else {
+                System.out.println("Купон с ID " + id + " не найден.");
             }
         });
     }
-    public Coupon findCoupon(Long id){
+
+    public Long createCoupon(String code, Double discount) {
         return transactionHelper.executeInTransaction(session -> {
-            return session.get(Coupon.class, id);
+            Coupon coupon = new Coupon();
+            coupon.setCode(code);
+            coupon.setDiscount(discount);
+            session.persist(coupon);
+            System.out.println("ℹ Создан новый купон: " + code);
+            return coupon.getId();
         });
     }
 }

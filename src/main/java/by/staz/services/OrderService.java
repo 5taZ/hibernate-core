@@ -1,6 +1,7 @@
 package by.staz.services;
 
 import by.staz.components.TransactionHelper;
+import by.staz.entity.Client;
 import by.staz.entity.Order;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,26 @@ public class OrderService {
                 query.setParameter("statusParam", status);
             }
             return query.getResultList();
+        });
+    }
+    public void addOrderToClient(Long clientId, LocalDateTime orderDate, BigDecimal amount, String status) {
+        transactionHelper.executeInTransaction(session -> {
+            Client client = session.get(Client.class, clientId);
+
+            if (client != null) {
+                Order order = new Order();
+                order.setOrderDate(orderDate);
+                order.setTotalAmount(amount);
+                order.setStatus(status);
+
+                client.addOrder(order);
+
+
+
+                System.out.println("Заказ на сумму " + amount + " успешно добавлен клиенту " + client.getName());
+            } else {
+                System.out.println("Ошибка: Клиент с ID " + clientId + " не найден.");
+            }
         });
     }
 }

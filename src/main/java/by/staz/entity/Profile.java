@@ -1,10 +1,7 @@
 package by.staz.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "profiles")
@@ -25,5 +22,6 @@ public class Profile {
 
     @OneToOne
     @JoinColumn(name = "client_id")
+    @ToString.Exclude
     private Client client;
 }

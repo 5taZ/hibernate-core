@@ -1,87 +1,187 @@
-import by.staz.components.TransactionHelper;
-import by.staz.entity.Client;
+
 import by.staz.entity.Order;
-import by.staz.entity.Profile;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import by.staz.services.ClientService;
+import by.staz.services.CouponService;
 import by.staz.services.OrderService;
-import org.hibernate.SessionFactory;
+import by.staz.services.ProfileService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context =
-                new AnnotationConfigApplicationContext("by/staz/");
+        // 1. Инициализация Spring Context
+        // Убедитесь, что "by.staz" - это корневой пакет, где лежат ваши конфиги и сервисы
+        ApplicationContext context = new AnnotationConfigApplicationContext("by.staz");
 
-        SessionFactory sessionFactory = context.getBean(SessionFactory.class);
-        TransactionHelper transactionHelper = context.getBean(TransactionHelper.class);
-
+        // 2. Получение бинов
         ClientService clientService = context.getBean(ClientService.class);
         OrderService orderService = context.getBean(OrderService.class);
+        CouponService couponService = context.getBean(CouponService.class);
+        ProfileService profileService = context.getBean(ProfileService.class);
 
-        createTestData(clientService);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Приложение успешно запущено!");
 
-        System.out.println("\n--- ТЕСТ 1: Поиск всех заказов (фильтры null) ---");
-        List<Order> allOrders = orderService.searchOrders(null, null, null);
-        printOrders(allOrders);
+        // 3. Главный цикл приложения
+        while (true) {
+            printMenu();
+            System.out.print("Введите номер команды: ");
+            String command = scanner.nextLine();
 
-        System.out.println("\n--- ТЕСТ 2: Поиск дорогих заказов (> 2000) ---");
-        List<Order> expensiveOrders = orderService.searchOrders(null, new BigDecimal("2000"), null);
-        printOrders(expensiveOrders);
-
-        System.out.println("\n--- ТЕСТ 3: Поиск по статусу 'COMPLETED' ---");
-        List<Order> completedOrders = orderService.searchOrders(null, null, "COMPLETED");
-        printOrders(completedOrders);
-
-        System.out.println("\n--- ТЕСТ 4: Комбинированный (Дороже 2000 И статус NEW) ---");
-        List<Order> comboOrders = orderService.searchOrders(null, new BigDecimal("2000"), "NEW");
-        printOrders(comboOrders);
-
-    }
-
-    private static void printOrders(List<Order> orders) {
-        if (orders.isEmpty()) {
-            System.out.println("Заказы не найдены.");
-        } else {
-            for (Order o : orders) {
-                System.out.printf("Order ID: %d | Сумма: %s | Статус: %s | Дата: %s\n",
-                        o.getId(), o.getTotalAmount(), o.getStatus(), o.getOrderDate());
+            try {
+                switch (command) {
+                    case "1" -> handleAddClient(scanner, clientService);
+                    case "2" -> handleDeleteClient(scanner, clientService);
+                    case "3" -> handleEditProfile(scanner, profileService);
+                    case "4" -> handleAddOrder(scanner, orderService);
+                    case "5" -> handleEditCoupon(scanner, couponService);
+                    case "6" -> handleSearchOrders(scanner, orderService);
+                    case "7" -> {
+                        System.out.println("Завершение работы...");
+                        return; // Выход из программы
+                    }
+                    default -> System.out.println("⚠ Неверная команда, попробуйте снова.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("⚠ Ошибка ввода: введите корректное число.");
+            } catch (Exception e) {
+                System.out.println("⚠ Произошла ошибка: " + e.getMessage());
+                e.printStackTrace(); // Можно убрать, если не нужен стектрейс
             }
+            System.out.println("--------------------------------------------------");
         }
     }
 
-    private static void createTestData(ClientService service) {
-        Client client = new Client();
-        client.setName("Test User");
-        client.setEmail("test@user.com");
-        client.setRegistrationDate(LocalDateTime.now());
-        client.setProfile(new Profile(null, "Address", "123", null));
+    private static void printMenu() {
+        System.out.println("\n=== МЕНЮ УПРАВЛЕНИЯ ===");
+        System.out.println("1. Добавить клиента");
+        System.out.println("2. Удалить клиента");
+        System.out.println("3. Редактировать профиль");
+        System.out.println("4. Добавить заказ");
+        System.out.println("5. Редактировать купоны");
+        System.out.println("6. Найти заказы (фильтр)");
+        System.out.println("7. Выход");
+    }
 
-        // Заказ 1: Дешевый, выполнен
-        Order o1 = new Order();
-        o1.setTotalAmount(new BigDecimal("500.00"));
-        o1.setStatus("COMPLETED");
-        o1.setOrderDate(LocalDateTime.now().minusDays(5));
-        client.addOrder(o1);
+    // --- 1. Добавление клиента ---
+    private static void handleAddClient(Scanner scanner, ClientService service) {
+        System.out.println("\n--- Добавление клиента ---");
+        System.out.print("Введите имя: ");
+        String name = scanner.nextLine();
 
-        // Заказ 2: Средний, новый
-        Order o2 = new Order();
-        o2.setTotalAmount(new BigDecimal("1500.00"));
-        o2.setStatus("NEW");
-        o2.setOrderDate(LocalDateTime.now().minusDays(2));
-        client.addOrder(o2);
+        System.out.print("Введите email: ");
+        String email = scanner.nextLine();
 
-        // Заказ 3: Дорогой, новый
-        Order o3 = new Order();
-        o3.setTotalAmount(new BigDecimal("5000.00"));
-        o3.setStatus("NEW");
-        o3.setOrderDate(LocalDateTime.now());
-        client.addOrder(o3);
+        System.out.print("Введите адрес: ");
+        String address = scanner.nextLine();
 
-        service.saveClient(client);
-        System.out.println("Тестовые данные созданы.");
+        System.out.print("Введите телефон: ");
+        String phone = scanner.nextLine();
+
+        // Вызываем ваш метод (передаем null/false для опциональных параметров, чтобы упростить ввод)
+        // Если хотите добавить ввод купонов сразу - можно расширить этот метод
+        Long id = service.addClient(name, email, address, phone, false, null, null, null);
+
+        System.out.println("✅ Клиент успешно создан. ID: " + id);
+    }
+
+    // --- 2. Удаление клиента ---
+    private static void handleDeleteClient(Scanner scanner, ClientService service) {
+        System.out.println("\n--- Удаление клиента ---");
+        System.out.print("Введите ID клиента для удаления: ");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        service.deleteClient(id);
+        // Сообщение об успехе уже есть внутри сервиса (или можно добавить тут)
+    }
+
+    // --- 3. Редактирование профиля ---
+    private static void handleEditProfile(Scanner scanner, ProfileService service) {
+        System.out.println("\n--- Редактирование профиля ---");
+        System.out.print("Введите ID клиента: ");
+        Long clientId = Long.parseLong(scanner.nextLine());
+
+        System.out.print("Новый адрес: ");
+        String address = scanner.nextLine();
+
+        System.out.print("Новый телефон: ");
+        String phone = scanner.nextLine();
+
+        service.updateProfileByClientId(clientId, address, phone);
+    }
+
+    // --- 4. Добавление заказа ---
+    private static void handleAddOrder(Scanner scanner, OrderService service) {
+        System.out.println("\n--- Добавление заказа ---");
+        System.out.print("Введите ID клиента: ");
+        Long clientId = Long.parseLong(scanner.nextLine());
+
+        System.out.print("Сумма заказа: ");
+        BigDecimal amount = new BigDecimal(scanner.nextLine());
+
+        System.out.print("Статус заказа (NEW, PAID, SHIPPED): ");
+        String status = scanner.nextLine();
+
+        service.addOrderToClient(clientId, java.time.LocalDateTime.now(), amount, status);
+    }
+
+    // --- 5. Редактирование купона ---
+    private static void handleEditCoupon(Scanner scanner, CouponService service) {
+        System.out.println("\n--- Редактирование купона ---");
+        System.out.print("Введите ID купона: ");
+        Long id = Long.parseLong(scanner.nextLine());
+
+        System.out.print("Новый код купона: ");
+        String code = scanner.nextLine();
+
+        System.out.print("Новая скидка (например 0.15): ");
+        Double discount = Double.parseDouble(scanner.nextLine());
+
+        service.editCoupon(id, code, discount);
+    }
+
+    // --- 6. Поиск заказов ---
+    private static void handleSearchOrders(Scanner scanner, OrderService service) {
+        System.out.println("\n--- Поиск заказов ---");
+        System.out.println("(Нажмите Enter, чтобы пропустить фильтр)");
+
+        System.out.print("Минимальная сумма: ");
+        String amountStr = scanner.nextLine();
+        BigDecimal minAmount = amountStr.isBlank() ? null : new BigDecimal(amountStr);
+
+        System.out.print("Статус: ");
+        String status = scanner.nextLine();
+        if (status.isBlank()) status = null;
+
+        // Тут можно добавить ввод даты, если нужно
+
+        System.out.println("Выполняю поиск...");
+        List<Order> orders = service.searchOrders(null, minAmount, status);
+
+        if (orders.isEmpty()) {
+            System.out.println("ℹ Заказы не найдены.");
+        } else {
+            // Красивый вывод таблицы
+            System.out.printf("%-5s | %-16s | %-10s | %-10s | %-20s%n", "ID", "Дата", "Сумма", "Статус", "Клиент");
+            System.out.println("-------------------------------------------------------------------------");
+
+            for (Order o : orders) {
+                // Если Fetch Join настроен правильно, этот вызов не сделает SQL-запрос
+                String clientName = (o.getClient() != null) ? o.getClient().getName() : "Unknown";
+
+                System.out.printf("%-5d | %-16s | %-10s | %-10s | %-20s%n",
+                        o.getId(),
+                        o.getOrderDate().toString().substring(0, 16).replace("T", " "),
+                        o.getTotalAmount(),
+                        o.getStatus(),
+                        clientName
+                );
+            }
+            System.out.println("Всего найдено: " + orders.size());
+        }
     }
 }

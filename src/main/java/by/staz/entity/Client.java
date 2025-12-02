@@ -13,6 +13,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,26 +45,33 @@ public class Client {
     private List<Coupon> coupons = new ArrayList<>();
 
     public void setProfile(Profile profile) {
-        this.profile = profile;
-        if(profile != null){
+        if (profile == null) {
+            if (this.profile != null) {
+                this.profile.setClient(null);
+            }
+        } else {
             profile.setClient(this);
         }
+        this.profile = profile;
     }
-    public void addOrder(Order order){
-        orders.add(order);
+
+    public void addOrder(Order order) {
+        this.orders.add(order);
         order.setClient(this);
     }
 
     public void removeOrder(Order order) {
-        orders.remove(order);
+        this.orders.remove(order);
         order.setClient(null);
     }
+
     public void addCoupon(Coupon coupon) {
-        coupons.add(coupon);
+        this.coupons.add(coupon);
         coupon.getClients().add(this);
     }
-    public void remove(Coupon coupon) {
-        coupons.remove(coupon);
+
+    public void removeCoupon(Coupon coupon) {
+        this.coupons.remove(coupon);
         coupon.getClients().remove(this);
     }
 }

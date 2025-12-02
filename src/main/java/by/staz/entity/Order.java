@@ -1,10 +1,7 @@
 package by.staz.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
+@EqualsAndHashCode(of = "id")
+@ToString
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +31,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @ToString.Exclude
     private Client client;
 }
